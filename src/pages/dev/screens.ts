@@ -1,0 +1,51 @@
+/** 기준 디자인 27개 화면과 이 앱에서 여는 주소 (PRD 6.2). 퍼블리싱 확인용 */
+export type ScreenLink = { id: string; name: string; path: string; note?: string }
+
+export const SCREENS: ScreenLink[] = [
+  { id: '00', name: '디자인 요소', path: '/__design' },
+  { id: '01', name: '로그인', path: '/login' },
+  { id: '02', name: '회원가입 — 이메일 인증', path: '/signup?step=2' },
+  { id: '02-2', name: '회원가입 — 약관 동의', path: '/signup?step=3' },
+  { id: '03', name: '온보딩 — 취향 입력', path: '/onboarding' },
+  { id: '03-5', name: '검색 시작 — 첫 화면', path: '/' },
+  { id: '03-6', name: '검색 시작 — 입력 중 (자동완성)', path: '/?q=경복' },
+  { id: '04', name: '탐색 홈 — 축제 탭', path: '/explore' },
+  { id: '04-2', name: '탐색 홈 — 관광지 탭', path: '/explore?tab=place' },
+  { id: '05', name: '상세', path: '/places/f-bitchorong' },
+  { id: '06', name: '찜 목록 — 축제 탭', path: '/likes' },
+  { id: '06-2', name: '찜 목록 — 관광지 탭', path: '/likes?tab=place' },
+  { id: '07-1', name: '추천 요청 — 지역', path: '/recommend?step=1' },
+  {
+    id: '07-2',
+    name: '추천 요청 — 기간·시작 시간',
+    path: '/recommend?step=2',
+    note: '월 버튼을 누르면 달 선택이 열려요',
+  },
+  { id: '07-3', name: '추천 요청 — 출발지', path: '/recommend?step=3' },
+  { id: '07-4', name: '추천 요청 — 동행', path: '/recommend?step=4' },
+  { id: '07-5', name: '추천 요청 — 꼭 포함할 장소', path: '/recommend?step=5' },
+  {
+    id: '08',
+    name: 'AI 코스 생성 중',
+    path: '/recommend/r-demo?status=pending',
+    note: '끝나면 09로 넘어가요',
+  },
+  { id: '09', name: '추천 결과', path: '/recommend/r-demo' },
+  { id: '10', name: '일정 편집', path: '/trips/t-palace/plans/p-basic/edit' },
+  { id: '11-1', name: '내 여행 — 목록', path: '/trips' },
+  { id: '11-2', name: '여행 상세 — 일정안 관리', path: '/trips/t-palace' },
+  { id: '11-4', name: '추천 결과 저장 — 어디에 저장할까요?', path: '/recommend/r-demo?modal=save' },
+  { id: '12', name: '캘린더 일괄 업로드', path: '/trips/t-palace/calendar' },
+  { id: '13', name: '마이페이지 — 취향 설정', path: '/my/preferences' },
+  {
+    id: '14-1',
+    name: '비로그인 — 상세에서 찜을 누른 순간',
+    path: '/places/f-bitchorong?guest=1&modal=wish',
+  },
+  {
+    id: '14-2',
+    name: '접근 정책 + 상황별 문구',
+    path: '/explore?guest=1&modal=compare',
+    note: '문구 4종: 찜(14-1) · 비교 바(이 주소) · 상단 AI 추천 · 일정에 추가를 비로그인으로 눌러 보세요',
+  },
+]

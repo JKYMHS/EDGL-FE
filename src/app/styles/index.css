@@ -9,6 +9,14 @@
   --font-sans: 'Pretendard Variable', Pretendard, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
+  /* 디자인은 브라우저 기본 줄 높이(normal)로 그려져 있다 */
+  --text-xs--line-height: normal;
+  --text-sm--line-height: normal;
+  --text-base--line-height: normal;
+  --text-lg--line-height: normal;
+  --text-xl--line-height: normal;
+  --text-2xl--line-height: normal;
+
   --color-bg: var(--color-bg);
   --color-ink: var(--color-ink);
   --color-sub: var(--color-sub);
@@ -45,6 +53,9 @@
   body,
   #root {
     height: 100%;
+  }
+  html {
+    line-height: normal;
   }
   body {
     @apply bg-bg font-sans text-ink antialiased;
