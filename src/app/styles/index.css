@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/600.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import './tokens.css';
+
+@theme inline {
+  --font-sans: 'Pretendard Variable', Pretendard, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-bg: var(--color-bg);
+  --color-ink: var(--color-ink);
+  --color-sub: var(--color-sub);
+  --color-muted: var(--color-muted);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-sky: var(--color-sky);
+  --color-sky-text: var(--color-sky-text);
+  --color-sky-soft: var(--color-sky-soft);
+  --color-sky-line: var(--color-sky-line);
+  --color-field: var(--color-field);
+  --color-surface: var(--color-surface);
+  --color-canvas: var(--color-canvas);
+  --color-warn: var(--color-warn);
+  --color-warn-soft: var(--color-warn-soft);
+  --color-error: var(--color-error);
+  --color-like: var(--color-like);
+  --color-done: var(--color-done);
+  --color-done-soft: var(--color-done-soft);
+  --color-day-1: var(--color-day-1);
+  --color-day-2: var(--color-day-2);
+  --color-day-3: var(--color-day-3);
+  --color-day-4: var(--color-day-4);
+  --color-map: var(--color-map);
+  --color-map-road: var(--color-map-road);
+
+  --shadow-tray: var(--shadow-tray);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-marker: var(--shadow-marker);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+  }
+}
