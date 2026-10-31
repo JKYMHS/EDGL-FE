@@ -2,18 +2,12 @@ import { useState, type ReactNode } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { emailVerifyDemo, demoUser, terms } from '@/mocks/data/member'
 import { cn } from '@/shared/lib/cn'
-import {
-  Button,
-  Checkbox,
-  NamedStepHeader,
-  NotDesigned,
-  StepHeading,
-  StepLayout,
-} from '@/shared/ui'
+import { SignupAccountStep } from './signup-account-step'
+import { Button, Checkbox, NamedStepHeader, StepHeading, StepLayout } from '@/shared/ui'
 
 const STEPS = ['이메일 · 비밀번호', '이메일 인증', '약관 동의', '취향 입력']
 
-/** 회원가입 4단계 (디자인 02 이메일 인증, 02-2 약관 동의) · FUNC-001-05~08 */
+/** 회원가입 4단계 (시안 A-1, 디자인 02 이메일 인증, 02-2 약관 동의) · FUNC-001-05~08 */
 export default function SignupPage() {
   const [params, setParams] = useSearchParams()
   const step = Math.min(Math.max(Number(params.get('step')) || 1, 1), 3)
@@ -34,17 +28,7 @@ export default function SignupPage() {
     />
   )
 
-  if (step === 1) {
-    return (
-      <div className="flex h-full flex-col">
-        {header}
-        <NotDesigned name="회원가입 1단계 — 이메일 · 비밀번호" />
-        <div className="flex justify-center pb-10">
-          <Button onClick={() => goTo(2)}>다음 (디자인 02로)</Button>
-        </div>
-      </div>
-    )
-  }
+  if (step === 1) return <SignupAccountStep header={header} onNext={() => goTo(2)} />
   if (step === 2) return <EmailVerifyStep header={header} onNext={() => goTo(3)} />
   return <TermsStep header={header} onPrev={() => goTo(2)} />
 }

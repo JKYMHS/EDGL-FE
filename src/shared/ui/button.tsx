@@ -7,6 +7,7 @@ const variants = {
   secondary: 'bg-white text-ink shadow-[inset_0_0_0_1px_var(--color-line)] hover:bg-[#F8FAFB]',
   soft: 'bg-sky-soft text-sky-text hover:bg-[#DDF0FD]',
   ghost: 'text-sub hover:text-ink',
+  danger: 'bg-error text-white hover:bg-[#9E3328]',
 } as const
 
 const sizes = {

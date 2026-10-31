@@ -52,3 +52,36 @@ export const terms: TermItem[] = [
 
 /** 이메일 인증 화면 예시 상태 (디자인 02) */
 export const emailVerifyDemo = { digits: ['4', '8', '2'], remaining: '04:32', resendIn: 52 }
+
+/** 이미 가입된 이메일 예시 (EMAIL_ALREADY_EXISTS, 디자인 A-1) */
+export const takenEmails = ['minji@example.com']
+
+/** 회원가입 1단계 예시 입력 (A-1): 이메일 중복, 비밀번호에 숫자가 빠짐 */
+export const signupDemo = { email: 'minji@example.com', password: 'tripseoulgo' }
+
+/** 비밀번호 찾기 예시 (A-2) */
+export const passwordResetDemo = {
+  email: 'minji@example.com',
+  code: '419073',
+  remaining: '04:19',
+  resendIn: 41,
+  attemptsLeft: 3,
+}
+
+/** 마이페이지 계정 (C-1) */
+export const accountDemo = {
+  name: '김민지',
+  email: 'minji@example.com',
+  google: { linked: true, email: 'minji@gmail.com' },
+  /** 구글로만 가입한 계정이면 비밀번호 대신 "비밀번호 설정" */
+  googleOnly: false,
+  consents: { location: true, behavior: true, emailAlert: false },
+}
+
+/** 회원 탈퇴 안내 (C-5) */
+export const withdrawSummary = [
+  { label: '여행·일정안', value: '5개 여행 · 9개 일정안', mono: true },
+  { label: '찜', value: '9곳', mono: true },
+  { label: '취향·행동 데이터', value: '모두 삭제' },
+  { label: '구글 캘린더에 올린 일정', value: '12개 삭제', mono: true },
+]

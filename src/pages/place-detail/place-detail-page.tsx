@@ -2,6 +2,8 @@ import { ArrowUpRight, ChevronLeft, Heart, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { LoginRequiredModal, usePreviewSession, type LoginGateReason } from '@/features/auth'
+import { AddToTripModal, NewTripModal } from '@/features/trip'
+import { addToTripDemo, newTripOptions } from '@/mocks/data/course'
 import { nearbyDefaultChecked, nearbyPlaces, placeDetail as place } from '@/mocks/data/place'
 import { cn } from '@/shared/lib/cn'
 import { MapCanvas, MapPanel, MapPin, NumberMarker } from '@/shared/map'
@@ -13,6 +15,7 @@ import {
   PanelTray,
   SplitLayout,
   StatusChip,
+  Toast,
 } from '@/shared/ui'
 
 function isGateReason(value: string | null): value is LoginGateReason {
@@ -30,6 +33,11 @@ export default function PlaceDetailPage() {
   const [gate, setGate] = useState<LoginGateReason | undefined>(
     !isLoggedIn && isGateReason(initialGate) ? initialGate : undefined,
   )
+
+  const [tripModal, setTripModal] = useState<'add' | 'new' | undefined>(
+    isLoggedIn && params.get('modal') === 'add' ? 'add' : undefined,
+  )
+  const [addedTo, setAddedTo] = useState<string>()
 
   const guard = (reason: LoginGateReason, run: () => void) => (isLoggedIn ? run() : setGate(reason))
   const toggleNearby = (id: string) =>
@@ -139,7 +147,7 @@ export default function PlaceDetailPage() {
               variant="secondary"
               size="sm"
               className="px-3.5"
-              onClick={() => guard('trip', () => navigate('/trips'))}
+              onClick={() => guard('trip', () => setTripModal('add'))}
             >
               <Plus size={14} strokeWidth={2.5} />
               일정에 추가
@@ -212,6 +220,43 @@ export default function PlaceDetailPage() {
               reason={gate}
               targetName={gate === 'wish' ? place.name : undefined}
             />
+          )}
+          {tripModal === 'add' && (
+            <AddToTripModal
+              open
+              onOpenChange={(open) => !open && setTripModal(undefined)}
+              placeName={addToTripDemo.place.name}
+              placePeriod={addToTripDemo.place.period}
+              trips={addToTripDemo.trips}
+              onNewTrip={() => setTripModal('new')}
+              onAdd={(title) => {
+                setTripModal(undefined)
+                setAddedTo(title)
+              }}
+            />
+          )}
+          <NewTripModal
+            open={tripModal === 'new'}
+            onOpenChange={(open) => !open && setTripModal(undefined)}
+            regions={newTripOptions.regions}
+            companions={newTripOptions.companions}
+            onCreate={() => navigate('/trips/t-busan')}
+          />
+          {addedTo && (
+            <Toast
+              onClose={() => setAddedTo(undefined)}
+              action={
+                <button
+                  type="button"
+                  onClick={() => navigate('/trips/t-cheonggye')}
+                  className="rounded-full bg-sky px-3.5 py-[7px] font-semibold"
+                >
+                  여행 보기
+                </button>
+              }
+            >
+              {addedTo}에 담았어요
+            </Toast>
           )}
         </>
       }

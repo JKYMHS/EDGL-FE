@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { SCREENS } from './screens'
+import { DRAFT_SCREENS, SCREENS, type ScreenLink } from './screens'
 
 /** 개발용: 기준 디자인 화면 목록 (개발 서버에서만 열림) */
 export default function ScreensPage() {
@@ -12,23 +12,31 @@ export default function ScreensPage() {
           `guest=1`을 붙이면 비로그인으로 볼 수 있어요.
         </p>
       </div>
-      <ol className="flex flex-col border-t border-line">
-        {SCREENS.map((s) => (
-          <li
-            key={s.id}
-            className="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-4 border-b border-line py-3"
-          >
-            <span className="font-mono text-sm font-semibold text-sky-text">{s.id}</span>
-            <span className="flex flex-col gap-0.5">
-              <span className="text-[15px] font-semibold">{s.name}</span>
-              {s.note && <span className="text-xs text-sub">{s.note}</span>}
-            </span>
-            <Link to={s.path} className="font-mono text-xs text-sub hover:text-sky-text">
-              {s.path}
-            </Link>
-          </li>
-        ))}
-      </ol>
+      <ScreenList screens={SCREENS} />
+      <h2 className="mt-6 text-[22px] font-bold">디자인 없던 화면 (시안)</h2>
+      <ScreenList screens={DRAFT_SCREENS} />
     </main>
+  )
+}
+
+function ScreenList({ screens }: { screens: ScreenLink[] }) {
+  return (
+    <ol className="flex flex-col border-t border-line">
+      {screens.map((s) => (
+        <li
+          key={s.id}
+          className="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-4 border-b border-line py-3"
+        >
+          <span className="font-mono text-sm font-semibold text-sky-text">{s.id}</span>
+          <span className="flex flex-col gap-0.5">
+            <span className="text-[15px] font-semibold">{s.name}</span>
+            {s.note && <span className="text-xs text-sub">{s.note}</span>}
+          </span>
+          <Link to={s.path} className="font-mono text-xs text-sub hover:text-sky-text">
+            {s.path}
+          </Link>
+        </li>
+      ))}
+    </ol>
   )
 }

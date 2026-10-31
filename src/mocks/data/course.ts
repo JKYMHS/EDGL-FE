@@ -364,3 +364,73 @@ export const calendarMealSlot = {
   label: '점심 시간 60분 · 장소 미선택이라 제외',
 }
 export const calendarAccount = { email: 'minji@gmail.com', calendarName: '여행' }
+
+/** 방문 확인 예시 (시안 E-3) · FUNC-003-09. 여행이 끝난 다음 날부터 내 여행에 배너가 뜬다 */
+export const visitCheckDemo = {
+  tripId: 't-palace',
+  title: '고궁과 정동 야행',
+  period: '10.24 – 10.25',
+  planName: '기본 코스',
+  places: {
+    1: [
+      { id: 'v1', name: '경복궁', visited: true, rating: 4 },
+      { id: 'v2', name: '국립현대미술관 서울', visited: true, rating: 3 },
+      { id: 'v3', name: '북촌 한옥마을', visited: false, rating: 0 },
+      { id: 'v4', name: '덕수궁', visited: true, rating: 0 },
+      { id: 'v5', name: '정동야행', visited: undefined, rating: 0 },
+    ],
+    2: [
+      { id: 'v6', name: '창덕궁', visited: undefined, rating: 0 },
+      { id: 'v7', name: '익선동 한옥거리', visited: undefined, rating: 0 },
+      { id: 'v8', name: '국립중앙박물관', visited: undefined, rating: 0 },
+      { id: 'v9', name: '용산가족공원', visited: undefined, rating: 0 },
+    ],
+  } as Record<number, { id: string; name: string; visited?: boolean; rating: number }[]>,
+}
+
+/** 상세에서 "+ 일정에 추가" (시안 E-2) · FUNC-004-06. 다가오는 여행과 축제 기간이 겹치는지 */
+export const addToTripDemo = {
+  place: { name: '서울빛초롱축제', period: '11.01 – 11.17' },
+  trips: [
+    {
+      id: 't-cheonggye',
+      title: '빛초롱 보러 가는 청계천',
+      period: '11.08',
+      planCount: 1,
+      overlaps: true,
+      plans: [{ id: 'p-night', name: '청계천 야경', confirmed: true }],
+      days: ['1일차 · 11.08'],
+    },
+    {
+      id: 't-palace',
+      title: '고궁과 정동 야행',
+      period: '10.24 – 10.25',
+      planCount: 3,
+      overlaps: false,
+      plans: [
+        { id: 'p-basic', name: '기본 코스', confirmed: true },
+        { id: 'p-rain', name: '비 오는 날 코스', confirmed: false },
+        { id: 'p-jeongdong', name: '정동 중심 여유 코스', confirmed: false },
+      ],
+      days: ['1일차 · 10.24', '2일차 · 10.25'],
+    },
+    {
+      id: 't-busan',
+      title: '부산 해운대 2박 3일',
+      period: '12.19 – 12.21',
+      planCount: 2,
+      overlaps: false,
+      plans: [
+        { id: 'p-b1', name: 'AI 추천 · 10.20', confirmed: false },
+        { id: 'p-b2', name: '해변 위주', confirmed: false },
+      ],
+      days: ['1일차 · 12.19', '2일차 · 12.20', '3일차 · 12.21'],
+    },
+  ],
+}
+
+/** 새 여행 만들기 선택지 (시안 E-1) · FUNC-004-01 */
+export const newTripOptions = {
+  regions: ['서울 · 중구', '서울 · 종로구', '부산 · 해운대구', '제주 · 제주시', '강원 · 강릉시'],
+  companions: ['혼자', '연인', '친구', '아이 동반', '부모님'],
+}

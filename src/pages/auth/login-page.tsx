@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { GoogleButton } from '@/features/auth'
 import { demoUser } from '@/mocks/data/member'
 import { MapCanvas, NumberMarker, RouteLine } from '@/shared/map'
-import { Button, Logo, TextField } from '@/shared/ui'
+import { Button, Logo, TextField, Toast } from '@/shared/ui'
 
 const COURSE = [
   { x: 27.6, y: 54.2 },
@@ -15,6 +15,9 @@ const COURSE = [
 /** 로그인 (디자인 01) · FUNC-001-01, 02 */
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [params] = useSearchParams()
+  // 비밀번호 찾기를 마치고 오면 완료 알림 (FUNC-001-09)
+  const [resetDone, setResetDone] = useState(params.get('reset') === 'done')
 
   return (
     <div className="flex h-full min-h-[720px]">
@@ -89,6 +92,11 @@ export default function LoginPage() {
           </div>
         </form>
       </section>
+      {resetDone && (
+        <Toast onClose={() => setResetDone(false)}>
+          비밀번호를 바꿨어요. 새 비밀번호로 로그인해 주세요.
+        </Toast>
+      )}
     </div>
   )
 }

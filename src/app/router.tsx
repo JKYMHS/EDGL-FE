@@ -22,6 +22,8 @@ export const routes: RouteObject[] = [
       { path: '/', lazy: page(() => import('@/pages/search-start/search-start-page')) },
       { path: '/login', lazy: page(() => import('@/pages/auth/login-page')) },
       { path: '/signup', lazy: page(() => import('@/pages/auth/signup-page')) },
+      { path: '/password/reset', lazy: page(() => import('@/pages/auth/password-reset-page')) },
+      { path: '/link-account', lazy: page(() => import('@/pages/auth/link-account-page')) },
       { path: '/onboarding', lazy: page(() => import('@/pages/onboarding/onboarding-page')) },
       { path: '/recommend', lazy: page(() => import('@/pages/recommend/recommend-request-page')) },
       {
@@ -53,9 +55,9 @@ export const routes: RouteObject[] = [
             children: [
               { index: true, element: <Navigate to="/my/preferences" replace /> },
               { path: 'preferences', lazy: page(() => import('@/pages/my/preferences-page')) },
-              { path: 'account', lazy: page(() => import('@/pages/my/my-placeholder-page')) },
-              { path: 'calendar', lazy: page(() => import('@/pages/my/my-placeholder-page')) },
-              { path: 'password', lazy: page(() => import('@/pages/my/my-placeholder-page')) },
+              { path: 'account', lazy: page(() => import('@/pages/my/account-page')) },
+              { path: 'calendar', lazy: page(() => import('@/pages/my/calendar-page')) },
+              { path: 'password', lazy: page(() => import('@/pages/my/password-page')) },
             ],
           },
         ],

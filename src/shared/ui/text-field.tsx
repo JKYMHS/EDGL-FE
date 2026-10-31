@@ -3,7 +3,7 @@ import { cn } from '@/shared/lib/cn'
 
 type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string
-  error?: string
+  error?: ReactNode
   /** 입력칸 오른쪽에 붙는 요소 (예: 비밀번호 "보기") */
   suffix?: ReactNode
 }
