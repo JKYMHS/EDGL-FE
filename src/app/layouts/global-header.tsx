@@ -15,8 +15,11 @@ const MENU: MenuItem[] = [
   { to: '/likes', label: '찜', match: ['/likes'], gate: 'wish' },
 ]
 
-/** 글로벌 헤더: 로고 · 검색창 · 메뉴 · 프로필 (PRD 6.1, 디자인 04, 14-1) */
-export function GlobalHeader() {
+/**
+ * 글로벌 헤더: 로고 · 검색창 · 메뉴 · 프로필 (PRD 6.1, 디자인 04, 14-1)
+ * hideSearch: 검색 시작 화면처럼 본문에 큰 로고·검색창이 있을 때 둘을 숨긴다 (높이·메뉴는 동일)
+ */
+export function GlobalHeader({ hideSearch = false }: { hideSearch?: boolean }) {
   const { pathname } = useLocation()
   const { isLoggedIn } = usePreviewSession()
   const onExplore = pathname.startsWith('/explore') || pathname.startsWith('/places')
@@ -24,8 +27,12 @@ export function GlobalHeader() {
 
   return (
     <header className="flex h-[76px] shrink-0 items-center gap-9 border-b border-line px-8">
-      <Logo />
-      <HeaderSearch emphasized={onExplore} />
+      {!hideSearch && (
+        <>
+          <Logo />
+          <HeaderSearch emphasized={onExplore} />
+        </>
+      )}
       <nav aria-label="주요 메뉴" className="ml-auto flex h-full gap-7 text-[15px] font-semibold">
         {MENU.map((item) => {
           const active = item.match.some((m) => pathname.startsWith(m))

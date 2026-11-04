@@ -21,3 +21,11 @@ describe('GlobalHeader', () => {
     expect(router.state.location.pathname).toBe('/explore')
   })
 })
+
+describe('GlobalHeader · 검색 시작 화면', () => {
+  it('검색 전에도 탐색 메뉴가 있고, 헤더 높이는 검색 후 화면과 같다', async () => {
+    renderRoute('/')
+    expect(await screen.findByRole('link', { name: '탐색' })).toBeInTheDocument()
+    expect(screen.getByRole('banner').className).toContain('h-[76px]')
+  })
+})

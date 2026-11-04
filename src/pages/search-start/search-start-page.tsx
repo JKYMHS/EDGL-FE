@@ -1,6 +1,7 @@
 import { CornerDownLeft, X } from 'lucide-react'
 import { Fragment, useState, type FormEvent, type ReactNode } from 'react'
-import { Link, NavLink, useNavigate, useSearchParams } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
+import { GlobalHeader } from '@/app/layouts/global-header'
 import { autocompleteGroups, recentSearches, searchSuggestionChips } from '@/mocks/data/search'
 import { cn } from '@/shared/lib/cn'
 import { DdayBadge, SearchMark } from '@/shared/ui'
@@ -33,23 +34,8 @@ export default function SearchStartPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-16 shrink-0 items-center justify-end gap-7 px-8 text-sm font-semibold text-sub">
-        <NavLink to="/recommend" className="hover:text-ink">
-          AI 추천
-        </NavLink>
-        <NavLink to="/trips" className="hover:text-ink">
-          내 여행
-        </NavLink>
-        <NavLink to="/likes" className="hover:text-ink">
-          찜
-        </NavLink>
-        <Link
-          to="/my/preferences"
-          aria-label="마이페이지"
-          className="size-[34px] rounded-full bg-map"
-        />
-      </header>
-      <main className="flex flex-1 flex-col items-center gap-7 pt-[170px]">
+      <GlobalHeader hideSearch />
+      <main className="flex flex-1 flex-col items-center gap-7 pt-[140px]">
         <h1 className="text-[64px] leading-none font-extrabold tracking-[-0.04em]">어디 갈래</h1>
         <form
           role="search"
