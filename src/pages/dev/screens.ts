@@ -83,7 +83,7 @@ export const SCREENS: ScreenLink[] = [
     note: '끝나면 09로 넘어가요',
   },
   { id: '09', name: '추천 결과', path: '/recommend/r-demo' },
-  { id: '10', name: '일정 편집', path: '/trips/t-palace/plans/p-basic/edit' },
+  { id: '10', name: '일정 편집', path: '/trips/t-palace/plans/p-basic/edit?state=reordered' },
   { id: '11-1', name: '내 여행 — 목록', path: '/trips' },
   { id: '11-2', name: '여행 상세 — 일정안 관리', path: '/trips/t-palace' },
   { id: '11-4', name: '추천 결과 저장 — 어디에 저장할까요?', path: '/recommend/r-demo?modal=save' },

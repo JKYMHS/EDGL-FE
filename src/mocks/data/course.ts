@@ -1,4 +1,6 @@
 import type {
+  AddPlaceCandidate,
+  AddPlaceSource,
   CalendarItem,
   Course,
   EditItem,
@@ -212,6 +214,10 @@ export const tripDetail = {
   period: '10.24 – 10.25',
   extra: '친구 · 서울역 출발',
   dday: 'D-5',
+  start: '2026-10-24',
+  end: '2026-10-25',
+  companion: '친구',
+  departure: '서울역 출발',
 }
 
 export const tripPlans: TripPlan[] = [
@@ -278,6 +284,87 @@ export const editItems: Record<number, EditItem[]> = {
   ],
 }
 export const editDemo = { draggingId: 'e2', unsavedChanges: 3, period: '10.24 – 10.25' }
+
+/** 일정 편집 "장소 추가" 후보 (찜 · 검색 · 식사·숙소 추천) */
+export const addPlaceCandidates: Record<AddPlaceSource, AddPlaceCandidate[]> = {
+  liked: [
+    {
+      id: 'f-bitchorong',
+      name: '서울빛초롱축제',
+      meta: '서울 중구 · 축제',
+      stay: 90,
+      point: { x: 56, y: 44 },
+    },
+    {
+      id: 'a-namsan',
+      name: '남산서울타워',
+      meta: '서울 용산구 · 전망',
+      stay: 90,
+      point: { x: 62, y: 80 },
+    },
+    { id: 'a-deoksu', name: '덕수궁', meta: '서울 중구 · 고궁', stay: 60, point: { x: 58, y: 62 } },
+  ],
+  search: [
+    {
+      id: 's-gwanghwamun',
+      name: '광화문광장',
+      meta: '서울 종로구 · 광장',
+      stay: 30,
+      point: { x: 30, y: 44 },
+    },
+    {
+      id: 's-gogung',
+      name: '국립고궁박물관',
+      meta: '서울 종로구 · 박물관',
+      stay: 60,
+      point: { x: 24, y: 34 },
+    },
+    {
+      id: 's-insadong',
+      name: '인사동 쌈지길',
+      meta: '서울 종로구 · 거리',
+      stay: 60,
+      point: { x: 46, y: 42 },
+    },
+    {
+      id: 's-cheonggye',
+      name: '청계천',
+      meta: '서울 중구 · 산책로',
+      stay: 45,
+      point: { x: 50, y: 50 },
+    },
+    {
+      id: 's-seochon',
+      name: '서촌 통인시장',
+      meta: '서울 종로구 · 시장',
+      stay: 60,
+      point: { x: 18, y: 36 },
+    },
+  ],
+  nearby: [
+    {
+      id: 'n-tosokchon',
+      name: '토속촌 삼계탕',
+      meta: '음식점 · 경복궁 도보 5분',
+      stay: 60,
+      point: { x: 20, y: 42 },
+    },
+    {
+      id: 'n-jeongdong',
+      name: '정동 국시',
+      meta: '음식점 · 덕수궁 도보 3분',
+      stay: 60,
+      point: { x: 60, y: 66 },
+    },
+    {
+      id: 'n-hanok',
+      name: '북촌 한옥스테이',
+      meta: '숙소 · 북촌 한옥마을 안',
+      stay: 60,
+      point: { x: 42, y: 26 },
+    },
+  ],
+}
 
 /** 캘린더 업로드 예시 (디자인 12) */
 export const calendarItems: CalendarItem[] = [
@@ -363,6 +450,12 @@ export const calendarMealSlot = {
   start: '12:45',
   label: '점심 시간 60분 · 장소 미선택이라 제외',
 }
+/** 캘린더 업로드 식사 슬롯 "고르기" 후보 (주변 음식점) */
+export const mealOptions = [
+  { name: '삼청동 수제비', meta: '한식 · 북촌 한옥마을 도보 6분' },
+  { name: '북촌 손만두', meta: '분식 · 북촌 한옥마을 도보 4분' },
+  { name: '카페 어니언 안국', meta: '베이커리 · 북촌 한옥마을 도보 8분' },
+]
 export const calendarAccount = { email: 'minji@gmail.com', calendarName: '여행' }
 
 /** 방문 확인 예시 (시안 E-3) · FUNC-003-09. 여행이 끝난 다음 날부터 내 여행에 배너가 뜬다 */

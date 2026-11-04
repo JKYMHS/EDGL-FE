@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { accountDemo } from '@/mocks/data/member'
-import { Button, ConfirmDialog, SettingsRow, Toggle } from '@/shared/ui'
+import { Button, ConfirmDialog, SettingsRow, TextField, Toggle } from '@/shared/ui'
+
+const NAME_MAX = 20
 import { MySection } from './my-section'
 
 type Consents = typeof accountDemo.consents
@@ -16,6 +18,8 @@ export default function AccountPage() {
   const [consents, setConsents] = useState(accountDemo.consents)
   const [googleLinked, setGoogleLinked] = useState(accountDemo.google.linked)
   const [confirmBehaviorOff, setConfirmBehaviorOff] = useState(false)
+  const [name, setName] = useState(accountDemo.name)
+  const [draftName, setDraftName] = useState<string>()
 
   const change = (key: keyof Consents, on: boolean) => {
     // 행동 데이터를 끄면 기존 데이터가 지워지므로 먼저 묻는다 (001-15)
@@ -25,6 +29,33 @@ export default function AccountPage() {
 
   return (
     <MySection title="계정" description="로그인 정보와 정보 이용 동의를 관리해요.">
+      <ConfirmDialog
+        open={draftName !== undefined}
+        onOpenChange={() => setDraftName(undefined)}
+        className="w-[420px]"
+        title="이름 바꾸기"
+        description="화면 위 프로필과 공유한 여행에 보이는 이름이에요."
+        confirmLabel="바꾸기"
+        onConfirm={() => {
+          const next = draftName?.trim()
+          if (!next) return
+          setName(next)
+          setDraftName(undefined)
+        }}
+      >
+        <TextField
+          aria-label="이름"
+          value={draftName ?? ''}
+          maxLength={NAME_MAX}
+          onChange={(e) => setDraftName(e.target.value)}
+          error={draftName?.trim() ? undefined : '이름을 입력해 주세요'}
+          suffix={
+            <span className="font-mono text-xs text-muted">
+              {draftName?.length ?? 0}/{NAME_MAX}
+            </span>
+          }
+        />
+      </ConfirmDialog>
       <SettingsRow title="이메일" hint="로그인 아이디">
         <span className="text-[15px]">{accountDemo.email}</span>
       </SettingsRow>
@@ -32,12 +63,12 @@ export default function AccountPage() {
         title="이름"
         hint="화면에 보이는 이름"
         aside={
-          <Button variant="secondary" size="xs">
+          <Button variant="secondary" size="xs" onClick={() => setDraftName(name)}>
             바꾸기
           </Button>
         }
       >
-        <span className="text-[15px]">{accountDemo.name}</span>
+        <span className="text-[15px]">{name}</span>
       </SettingsRow>
       <SettingsRow
         title="구글 계정"

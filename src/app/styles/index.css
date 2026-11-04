@@ -60,4 +60,21 @@
   body {
     @apply bg-bg font-sans text-ink antialiased;
   }
+  /* Tailwind 4는 버튼 커서를 기본(default)으로 둔다. 누를 수 있는 요소는 손가락 커서로 */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='tab'],
+  [role='menuitem'],
+  [role='switch'],
+  [role='checkbox'],
+  [role='radio'],
+  label:has(input, button),
+  select,
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
 }
