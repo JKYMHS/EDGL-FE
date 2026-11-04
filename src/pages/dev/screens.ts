@@ -1,0 +1,103 @@
+/** 기준 디자인 27개 화면과 이 앱에서 여는 주소 (PRD 6.2). 퍼블리싱 확인용 */
+export type ScreenLink = { id: string; name: string; path: string; note?: string }
+
+/** 기준 디자인에 없던 화면 18개. 시안 페이지(어디 갈래 — 디자인 없는 화면 시안)의 번호와 같다 */
+export const DRAFT_SCREENS: ScreenLink[] = [
+  { id: 'A-1', name: '회원가입 1단계 — 이메일·비밀번호', path: '/signup?step=1' },
+  { id: 'A-2', name: '비밀번호 찾기 — 이메일 인증', path: '/password/reset' },
+  { id: 'A-3', name: '비밀번호 찾기 — 새 비밀번호', path: '/password/reset?step=2' },
+  { id: 'A-4', name: '구글 계정 연결', path: '/link-account' },
+  { id: 'B-1', name: '온보딩 2 — 페이스', path: '/onboarding?step=2' },
+  { id: 'B-2', name: '온보딩 3 — 선호 시간대', path: '/onboarding?step=3' },
+  { id: 'B-3', name: '온보딩 4 — 이동 편의', path: '/onboarding?step=4' },
+  { id: 'B-4', name: '온보딩 5 — 반려동물', path: '/onboarding?step=5' },
+  {
+    id: 'C-1',
+    name: '마이페이지 — 계정',
+    path: '/my/account',
+    note: '행동 데이터 토글을 끄면 삭제 안내가 떠요',
+  },
+  {
+    id: 'C-2',
+    name: '마이페이지 — 캘린더 연동',
+    path: '/my/calendar',
+    note: '연동 전 상태는 /my/calendar?state=disconnected',
+  },
+  {
+    id: 'C-3',
+    name: '마이페이지 — 비밀번호 변경',
+    path: '/my/password',
+    note: '현재 비밀번호에 wrong을 넣으면 오류 상태',
+  },
+  {
+    id: 'C-4',
+    name: '로그아웃 확인',
+    path: '/my/preferences',
+    note: '사이드 메뉴의 로그아웃을 눌러 보세요',
+  },
+  {
+    id: 'C-5',
+    name: '회원 탈퇴',
+    path: '/my/preferences',
+    note: '사이드 메뉴의 회원 탈퇴를 눌러 보세요',
+  },
+  { id: 'D-1', name: '확정된 여행 일괄 업로드', path: '/my/calendar?modal=bulk' },
+  {
+    id: 'D-2',
+    name: '일괄 업로드 결과',
+    path: '/my/calendar?modal=bulk',
+    note: 'D-1에서 올리기를 누르면 나와요',
+  },
+  { id: 'E-1', name: '새 여행 만들기', path: '/trips?modal=new' },
+  { id: 'E-2', name: '기존 여행에 장소 추가', path: '/places/f-bitchorong?modal=add' },
+  { id: 'E-3', name: '방문 확인', path: '/trips?modal=visit' },
+]
+
+export const SCREENS: ScreenLink[] = [
+  { id: '00', name: '디자인 요소', path: '/__design' },
+  { id: '01', name: '로그인', path: '/login' },
+  { id: '02', name: '회원가입 — 이메일 인증', path: '/signup?step=2' },
+  { id: '02-2', name: '회원가입 — 약관 동의', path: '/signup?step=3' },
+  { id: '03', name: '온보딩 — 취향 입력', path: '/onboarding' },
+  { id: '03-5', name: '검색 시작 — 첫 화면', path: '/' },
+  { id: '03-6', name: '검색 시작 — 입력 중 (자동완성)', path: '/?q=경복' },
+  { id: '04', name: '탐색 홈 — 축제 탭', path: '/explore' },
+  { id: '04-2', name: '탐색 홈 — 관광지 탭', path: '/explore?tab=place' },
+  { id: '05', name: '상세', path: '/places/f-bitchorong' },
+  { id: '06', name: '찜 목록 — 축제 탭', path: '/likes' },
+  { id: '06-2', name: '찜 목록 — 관광지 탭', path: '/likes?tab=place' },
+  { id: '07-1', name: '추천 요청 — 지역', path: '/recommend?step=1' },
+  {
+    id: '07-2',
+    name: '추천 요청 — 기간·시작 시간',
+    path: '/recommend?step=2',
+    note: '월 버튼을 누르면 달 선택이 열려요',
+  },
+  { id: '07-3', name: '추천 요청 — 출발지', path: '/recommend?step=3' },
+  { id: '07-4', name: '추천 요청 — 동행', path: '/recommend?step=4' },
+  { id: '07-5', name: '추천 요청 — 꼭 포함할 장소', path: '/recommend?step=5' },
+  {
+    id: '08',
+    name: 'AI 코스 생성 중',
+    path: '/recommend/r-demo?status=pending',
+    note: '끝나면 09로 넘어가요',
+  },
+  { id: '09', name: '추천 결과', path: '/recommend/r-demo' },
+  { id: '10', name: '일정 편집', path: '/trips/t-palace/plans/p-basic/edit' },
+  { id: '11-1', name: '내 여행 — 목록', path: '/trips' },
+  { id: '11-2', name: '여행 상세 — 일정안 관리', path: '/trips/t-palace' },
+  { id: '11-4', name: '추천 결과 저장 — 어디에 저장할까요?', path: '/recommend/r-demo?modal=save' },
+  { id: '12', name: '캘린더 일괄 업로드', path: '/trips/t-palace/calendar' },
+  { id: '13', name: '마이페이지 — 취향 설정', path: '/my/preferences' },
+  {
+    id: '14-1',
+    name: '비로그인 — 상세에서 찜을 누른 순간',
+    path: '/places/f-bitchorong?guest=1&modal=wish',
+  },
+  {
+    id: '14-2',
+    name: '접근 정책 + 상황별 문구',
+    path: '/explore?guest=1&modal=compare',
+    note: '문구 4종: 찜(14-1) · 비교 바(이 주소) · 상단 AI 추천 · 일정에 추가를 비로그인으로 눌러 보세요',
+  },
+]

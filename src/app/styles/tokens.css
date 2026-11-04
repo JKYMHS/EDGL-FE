@@ -1,0 +1,36 @@
+/* 디자인 토큰 (TRD 10장). 값은 기준 디자인에서 가져왔다. */
+:root {
+  --color-bg: #ffffff;
+  --color-ink: #1e2420;
+  --color-sub: #5b635d;
+  --color-muted: #8a918b;
+  --color-line: #e3e6e8;
+  --color-line-strong: #cfd6db;
+
+  --color-sky: #1e9deb;
+  --color-sky-text: #0b7bc4;
+  --color-sky-soft: #eaf6fe;
+  --color-sky-line: #b9e1fa;
+  --color-field: #f3f5f7;
+  --color-surface: #eef1f3;
+  --color-canvas: #e9ecef;
+
+  --color-warn: #a86b00;
+  --color-warn-soft: #fbf6ea;
+  --color-error: #b23a2e;
+  --color-like: #e2552d;
+  --color-done: #1b7a4b;
+  --color-done-soft: #e8f5ee;
+
+  --color-day-1: #e2552d;
+  --color-day-2: #2c6bd8;
+  --color-day-3: #2e9a5a;
+  --color-day-4: #8a4fd1;
+
+  --color-map: #dce3e8;
+  --color-map-road: #f5f8fa;
+
+  --shadow-tray: 0 12px 32px rgba(30, 36, 32, 0.16), 0 2px 6px rgba(30, 36, 32, 0.06);
+  --shadow-panel: 0 24px 48px rgba(30, 36, 32, 0.12);
+  --shadow-marker: 0 2px 8px rgba(30, 36, 32, 0.25);
+}
