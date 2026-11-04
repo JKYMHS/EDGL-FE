@@ -1,3 +1,4 @@
+import { cn } from '@/shared/lib/cn'
 import { Button, PanelTray, Pill } from '@/shared/ui'
 import type { ContentItem } from '../model/types'
 
@@ -7,14 +8,16 @@ export function CompareTray({
   onRemove,
   actionLabel,
   onAction,
+  className,
 }: {
   items: ContentItem[]
   onRemove: (id: string) => void
   actionLabel: string
   onAction: () => void
+  className?: string
 }) {
   return (
-    <PanelTray className="pl-[18px]">
+    <PanelTray className={cn('pl-[18px]', className)}>
       <span className="text-[13px] font-semibold whitespace-nowrap">
         비교 <span className="font-mono">{items.length}</span>
       </span>

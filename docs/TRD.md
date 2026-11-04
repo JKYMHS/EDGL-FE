@@ -62,9 +62,9 @@
 src/
 ├─ app/                  # 진입점: 라우터, Provider(Query·Router), 전역 스타일, 데스크톱 전용 안내
 ├─ pages/                # 화면 단위. PRD 6.2 경로와 1:1
-│  ├─ search-start/  explore/  place-detail/  likes/
+│  ├─ search-start/  explore/  place-detail/
 │  ├─ recommend/  trips/  plan-edit/  calendar-upload/
-│  ├─ my/  auth/  oauth/  # oauth: 구글 콜백 화면
+│  ├─ my/  auth/  oauth/  # my: 찜한 곳 포함, oauth: 구글 콜백 화면
 ├─ features/             # 기능별 로직과 전용 UI
 │  ├─ auth/  onboarding/  consent/
 │  ├─ explore/  place/  compare/
@@ -110,13 +110,13 @@ PRD 6.2의 경로를 그대로 쓴다. 로그인 필요 경로는 `RequireAuth` 
 | `/` | 검색 시작 | 공개 |
 | `/explore` | 탐색 (`?tab=festival\|place&q=&region=&category=&status=&sort=&chip=`) | 공개 |
 | `/places/:id` | 상세 | 공개 |
-| `/likes` | 찜 | 로그인 |
+| `/my/likes` | 찜한 곳 (마이페이지 첫 화면). 옛 `/likes`는 쿼리를 유지한 채 넘긴다 | 로그인 |
 | `/recommend` | 추천 요청 5단계 | 로그인 |
 | `/recommend/:requestId` | 생성 중 · 결과 | 로그인 |
 | `/trips`, `/trips/:tripId` | 내 여행 목록 · 여행 상세 | 로그인 |
 | `/trips/:tripId/plans/:planId/edit` | 일정 편집 | 로그인 |
 | `/trips/:tripId/calendar` | 캘린더 업로드 | 로그인 |
-| `/my/account`, `/my/preferences`, `/my/calendar`, `/my/password` | 마이페이지 | 로그인 |
+| `/my`, `/my/account`, `/my/preferences`, `/my/calendar`, `/my/password` | 마이페이지 | 로그인 |
 | `/login`, `/signup`, `/password/reset`, `/link-account` | 인증 | 공개 |
 | `/onboarding` | 온보딩 | 로그인 |
 | `/oauth/google/callback`, `/oauth/google/calendar/callback` | 구글 콜백 | 공개 |
