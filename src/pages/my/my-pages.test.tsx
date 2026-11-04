@@ -62,3 +62,17 @@ describe('사이드 메뉴 (C-4, C-5)', () => {
     expect(screen.getByRole('button', { name: '탈퇴하기' })).toBeInTheDocument()
   })
 })
+
+describe('마이페이지 계정 — 이름 바꾸기 (C-1)', () => {
+  it('새 이름을 저장하고, 비우면 바꿀 수 없다', async () => {
+    renderRoute('/my/account')
+    await userEvent.click(await screen.findByRole('button', { name: '바꾸기' }))
+    const dialog = screen.getByRole('dialog', { name: '이름 바꾸기' })
+    const input = within(dialog).getByRole('textbox', { name: '이름' })
+    await userEvent.clear(input)
+    expect(within(dialog).getByText('이름을 입력해 주세요')).toBeInTheDocument()
+    await userEvent.type(input, '민지')
+    await userEvent.click(within(dialog).getByRole('button', { name: '바꾸기' }))
+    expect(screen.getByText('민지')).toBeInTheDocument()
+  })
+})

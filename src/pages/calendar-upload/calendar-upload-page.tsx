@@ -2,11 +2,18 @@ import { Check, ChevronDown, ChevronLeft } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { Link } from 'react-router'
 import type { CalendarItem } from '@/features/trip'
-import { calendarAccount, calendarItems, calendarMealSlot, demoCourse } from '@/mocks/data/course'
+import { calendarLink } from '@/mocks/data/calendar'
+import {
+  calendarAccount,
+  calendarItems,
+  calendarMealSlot,
+  demoCourse,
+  mealOptions,
+} from '@/mocks/data/course'
 import { dayColor } from '@/shared/config/day-colors'
 import { cn } from '@/shared/lib/cn'
-import { toHours } from '@/shared/lib/time'
-import { Button, LeftPanel, PanelTray } from '@/shared/ui'
+import { durationLabel, fromMinutes, toHours, toMinutes } from '@/shared/lib/time'
+import { Button, LeftPanel, Modal, MoreMenu, PanelTray, Toast } from '@/shared/ui'
 
 const STATE_LABEL: Record<CalendarItem['state'], [string, string, string]> = {
   new: ['새 항목', '●', 'text-sky-text'],
@@ -19,20 +26,54 @@ const HOURS = Array.from({ length: 13 }, (_, i) => FIRST_HOUR + i)
 
 /** 캘린더 일괄 업로드 (디자인 12) · FUNC-005-03, 04. 동기화된 항목은 기본으로 빼 둔다 */
 export default function CalendarUploadPage() {
+  const [items, setItems] = useState(calendarItems)
   const [picked, setPicked] = useState(
     calendarItems.filter((i) => i.state !== 'synced').map((i) => i.id),
   )
+  const [calendarName, setCalendarName] = useState(calendarAccount.calendarName)
+  const [mealOpen, setMealOpen] = useState(false)
+  const [mealPicked, setMealPicked] = useState(false)
+  const [uploaded, setUploaded] = useState<number>()
+
+  // 식사 슬롯에 음식점을 고르면 그 시간의 새 항목이 된다 (PRD 003-10)
+  const pickMeal = (name: string) => {
+    const start = toMinutes(calendarMealSlot.start)
+    const meal: CalendarItem = {
+      id: 'meal',
+      day: calendarMealSlot.day,
+      start: calendarMealSlot.start,
+      end: fromMinutes(start + 60),
+      duration: durationLabel(60),
+      name,
+      state: 'new',
+    }
+    setItems((list) => {
+      const i = list.findIndex((it) => it.id === calendarMealSlot.before)
+      return [...list.slice(0, i), meal, ...list.slice(i)]
+    })
+    setPicked((list) => [...list, meal.id])
+    setMealPicked(true)
+    setMealOpen(false)
+  }
+
+  const upload = () => {
+    setUploaded(picked.length)
+    setItems((list) =>
+      list.map((i) => (picked.includes(i.id) ? { ...i, state: 'synced' as const } : i)),
+    )
+    setPicked([])
+  }
   const toggle = (id: string) =>
     setPicked((list) => (list.includes(id) ? list.filter((v) => v !== id) : [...list, id]))
   const toggleDay = (day: number) => {
-    const ids = calendarItems.filter((i) => i.day === day).map((i) => i.id)
+    const ids = items.filter((i) => i.day === day).map((i) => i.id)
     const allOn = ids.every((id) => picked.includes(id))
     setPicked((list) =>
       allOn ? list.filter((id) => !ids.includes(id)) : [...new Set([...list, ...ids])],
     )
   }
   const count = (state: CalendarItem['state']) =>
-    calendarItems.filter((i) => i.state === state && picked.includes(i.id)).length
+    items.filter((i) => i.state === state && picked.includes(i.id)).length
 
   return (
     <div className="flex min-h-0 flex-1">
@@ -55,16 +96,26 @@ export default function CalendarUploadPage() {
               <span className="text-sm font-semibold">{calendarAccount.email}</span>
               <span className="text-xs font-semibold text-done">● 연동됨</span>
             </span>
-            <Button variant="secondary" size="xs" className="gap-1.5 px-3">
-              캘린더: {calendarAccount.calendarName}
-              <ChevronDown size={13} />
-            </Button>
+            <MoreMenu
+              label="올릴 캘린더"
+              className="w-[180px]"
+              trigger={
+                <Button variant="secondary" size="xs" className="gap-1.5 px-3">
+                  캘린더: {calendarName}
+                  <ChevronDown size={13} />
+                </Button>
+              }
+              items={calendarLink.calendars.map((c) => ({
+                label: c === calendarName ? `✓ ${c}` : c,
+                onSelect: () => setCalendarName(c),
+              }))}
+            />
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-6 pt-1 pb-[100px]">
           {demoCourse.days.map((d) => {
             const color = dayColor(d.day)
-            const items = calendarItems.filter((i) => i.day === d.day)
+            const dayItems = items.filter((i) => i.day === d.day)
             return (
               <section key={d.day} aria-label={`${d.day}일차`}>
                 <div className="flex items-center gap-2.5 pt-3.5 pb-2">
@@ -81,28 +132,34 @@ export default function CalendarUploadPage() {
                     이 날 전체
                   </button>
                 </div>
-                {items.map((item, k) => {
+                {dayItems.map((item, k) => {
                   const on = picked.includes(item.id)
                   const [label, icon, tone] = STATE_LABEL[item.state]
                   const h = Math.max(64, (toHours(item.end) - toHours(item.start)) * 52)
                   return (
                     <Fragment key={item.id}>
-                      {calendarMealSlot.day === d.day && calendarMealSlot.before === item.id && (
-                        <div className="grid grid-cols-[52px_24px_minmax(0,1fr)] gap-3">
-                          <span className="pt-2.5 font-mono text-xs font-medium text-[#A3AAB0]">
-                            {calendarMealSlot.start}
-                          </span>
-                          <span className="flex justify-center">
-                            <span className="w-0.5 bg-line" />
-                          </span>
-                          <div className="my-1 flex justify-between rounded-[10px] border-[1.5px] border-dashed border-line-strong px-3.5 py-[9px] text-[13px] text-muted">
-                            <span>{calendarMealSlot.label}</span>
-                            <button type="button" className="font-semibold text-sky-text">
-                              고르기
-                            </button>
+                      {!mealPicked &&
+                        calendarMealSlot.day === d.day &&
+                        calendarMealSlot.before === item.id && (
+                          <div className="grid grid-cols-[52px_24px_minmax(0,1fr)] gap-3">
+                            <span className="pt-2.5 font-mono text-xs font-medium text-[#A3AAB0]">
+                              {calendarMealSlot.start}
+                            </span>
+                            <span className="flex justify-center">
+                              <span className="w-0.5 bg-line" />
+                            </span>
+                            <div className="my-1 flex justify-between rounded-[10px] border-[1.5px] border-dashed border-line-strong px-3.5 py-[9px] text-[13px] text-muted">
+                              <span>{calendarMealSlot.label}</span>
+                              <button
+                                type="button"
+                                onClick={() => setMealOpen(true)}
+                                className="font-semibold text-sky-text hover:underline"
+                              >
+                                고르기
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
                       <div
                         className="grid grid-cols-[52px_24px_minmax(0,1fr)] gap-3"
                         style={{ minHeight: h }}
@@ -160,7 +217,7 @@ export default function CalendarUploadPage() {
             <span className="font-mono font-semibold text-ink">{count('changed')}</span> · 식사
             시간은 장소를 골라야 올라가요
           </span>
-          <Button size="sm" className="px-[18px]" disabled={picked.length === 0}>
+          <Button size="sm" className="px-[18px]" disabled={picked.length === 0} onClick={upload}>
             <span className="font-mono">{picked.length}</span>개 올리기
           </Button>
         </PanelTray>
@@ -192,7 +249,7 @@ export default function CalendarUploadPage() {
                 {String(h).padStart(2, '0')}:00
               </div>
             ))}
-            {calendarItems
+            {items
               .filter((i) => picked.includes(i.id) || i.state === 'synced')
               .map((i) => (
                 <div
@@ -211,6 +268,53 @@ export default function CalendarUploadPage() {
           </div>
         </div>
       </section>
+
+      <Modal
+        open={mealOpen}
+        onOpenChange={setMealOpen}
+        closeButton
+        title="점심 먹을 곳 고르기"
+        description={
+          <span className="text-sm">
+            <span className="font-mono">{calendarMealSlot.start}</span>부터 60분 · 고르면 캘린더에
+            함께 올라가요
+          </span>
+        }
+        className="w-[480px] gap-4 rounded-[20px]"
+      >
+        <ul className="flex flex-col">
+          {mealOptions.map((m) => (
+            <li key={m.name}>
+              <button
+                type="button"
+                onClick={() => pickMeal(m.name)}
+                className="flex w-full items-center justify-between rounded-[10px] px-3 py-3 text-left hover:bg-[#F5F8FA]"
+              >
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-[15px] font-semibold">{m.name}</span>
+                  <span className="text-xs text-sub">{m.meta}</span>
+                </span>
+                <span className="text-[13px] font-semibold text-sky-text">고르기</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Modal>
+      {uploaded !== undefined && (
+        <Toast
+          onClose={() => setUploaded(undefined)}
+          action={
+            <Link
+              to="/trips/t-palace"
+              className="rounded-full bg-sky px-3.5 py-1.5 font-semibold text-white"
+            >
+              여행으로 돌아가기
+            </Link>
+          }
+        >
+          &quot;{calendarName}&quot; 캘린더에 일정 {uploaded}개를 올렸어요
+        </Toast>
+      )}
     </div>
   )
 }

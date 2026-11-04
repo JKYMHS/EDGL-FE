@@ -6,26 +6,37 @@ import {
   MustVisitStep,
   PeriodStep,
   RegionStep,
+  useCurrentLocation,
+  type DepartureOption,
   type RecommendDraft,
 } from '@/features/recommend'
+import { accountDemo } from '@/mocks/data/member'
 import {
   MUST_VISIT_LIMIT,
   calendarMonth,
   calendarPastBefore,
-  calendarWeeks,
   companionOptions,
   departureResults,
   districtOptions,
   initialDraft,
-  moreDistrictCount,
+  moreDistrictOptions,
   mustVisitCandidates,
+  mustVisitSearchPool,
   recentDepartures,
   recommendQuota,
+  resolveDemoAddress,
   regionOptions,
   startTimeOptions,
 } from '@/mocks/data/recommend'
 import { formatShortRange, tripLengthLabel } from '@/shared/lib/date'
-import { Button, Pill, ProgressStepHeader, StepHeading, StepLayout } from '@/shared/ui'
+import {
+  Button,
+  ConfirmDialog,
+  Pill,
+  ProgressStepHeader,
+  StepHeading,
+  StepLayout,
+} from '@/shared/ui'
 
 const TOTAL = 5
 
@@ -58,12 +69,26 @@ export default function RecommendRequestPage() {
   const step = readStep(params.get('step'))
   const [draft, setDraft] = useState<RecommendDraft>(initialDraft)
   const [departureQuery, setDepartureQuery] = useState('서울역')
+  const [viewMonth, setViewMonth] = useState(calendarMonth)
+  const [current, setCurrent] = useState<DepartureOption>()
+  const [locationConsent, setLocationConsent] = useState(accountDemo.consents.location)
+  const [consentOpen, setConsentOpen] = useState(false)
+  const { status: locateStatus, locate } = useCurrentLocation(resolveDemoAddress)
+
+  // 위치 동의 확인 → 브라우저 권한 → 좌표를 주소로 (PRD 003-01). 좌표는 저장하지 않는다
+  const applyCurrentLocation = async () => {
+    const address = await locate()
+    if (!address) return
+    setCurrent({ id: 'current', name: '현재 위치', address })
+    update({ departureId: 'current' })
+  }
 
   const update = (patch: Partial<RecommendDraft>) => setDraft((d) => ({ ...d, ...patch }))
   const goTo = (n: number) => setParams({ step: String(n) })
 
   const region = regionOptions.find((r) => r.id === draft.regionId)
-  const departure = departureResults.find((d) => d.id === draft.departureId)
+  const departureOptions = [...(current ? [current] : []), ...departureResults]
+  const departure = departureOptions.find((d) => d.id === draft.departureId)
   const companion = companionOptions.find((c) => c.id === draft.companionId)
   const regionLabel = [region?.name, draft.districts.join(', ')].filter(Boolean).join(' · ')
   const length = draft.start && draft.end ? tripLengthLabel(draft.start, draft.end) : undefined
@@ -164,7 +189,7 @@ export default function RecommendRequestPage() {
         <RegionStep
           regions={regionOptions}
           districts={districtOptions}
-          moreDistrictCount={moreDistrictCount}
+          moreDistricts={moreDistrictOptions}
           regionId={draft.regionId}
           selectedDistricts={draft.districts}
           onRegionChange={(regionId) => update({ regionId, districts: [] })}
@@ -173,10 +198,10 @@ export default function RecommendRequestPage() {
       )}
       {step === 2 && (
         <PeriodStep
-          year={calendarMonth.year}
-          month={calendarMonth.month}
-          weeks={calendarWeeks}
-          pastBefore={calendarPastBefore}
+          year={viewMonth.year}
+          month={viewMonth.month}
+          today={calendarPastBefore}
+          onMonthChange={setViewMonth}
           start={draft.start}
           end={draft.end}
           startTime={draft.startTime}
@@ -189,7 +214,11 @@ export default function RecommendRequestPage() {
       {step === 3 && (
         <DepartureStep
           query={departureQuery}
-          results={departureQuery ? departureResults : []}
+          results={[...(current ? [current] : []), ...(departureQuery ? departureResults : [])]}
+          locateStatus={locateStatus}
+          onUseCurrentLocation={() =>
+            locationConsent ? applyCurrentLocation() : setConsentOpen(true)
+          }
           recent={recentDepartures}
           selectedId={draft.departureId}
           onQueryChange={setDepartureQuery}
@@ -208,11 +237,25 @@ export default function RecommendRequestPage() {
       {step === 5 && (
         <MustVisitStep
           candidates={mustVisitCandidates}
+          searchPool={mustVisitSearchPool}
           selectedIds={draft.mustVisitIds}
           limit={MUST_VISIT_LIMIT}
           onChange={(mustVisitIds) => update({ mustVisitIds })}
         />
       )}
+      <ConfirmDialog
+        open={consentOpen}
+        onOpenChange={setConsentOpen}
+        className="w-[440px]"
+        title="위치 정보 이용에 동의할까요?"
+        description="현재 위치를 출발지 주소로 바꾸는 데만 쓰고, 좌표는 저장하지 않아요. 마이페이지 계정에서 언제든 끌 수 있어요."
+        confirmLabel="동의하고 사용하기"
+        onConfirm={() => {
+          setLocationConsent(true)
+          setConsentOpen(false)
+          void applyCurrentLocation()
+        }}
+      />
     </StepLayout>
   )
 }

@@ -2,6 +2,7 @@ import { ArrowUpRight, ChevronLeft, Heart, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { LoginRequiredModal, usePreviewSession, type LoginGateReason } from '@/features/auth'
+import { ImageGalleryModal } from '@/features/place'
 import { AddToTripModal, NewTripModal } from '@/features/trip'
 import { addToTripDemo, newTripOptions } from '@/mocks/data/course'
 import { nearbyDefaultChecked, nearbyPlaces, placeDetail as place } from '@/mocks/data/place'
@@ -38,6 +39,8 @@ export default function PlaceDetailPage() {
     isLoggedIn && params.get('modal') === 'add' ? 'add' : undefined,
   )
   const [addedTo, setAddedTo] = useState<string>()
+  const [gallery, setGallery] = useState<number>()
+  const imageCount = 2 + place.extraImageCount
 
   const guard = (reason: LoginGateReason, run: () => void) => (isLoggedIn ? run() : setGate(reason))
   const toggleNearby = (id: string) =>
@@ -57,14 +60,26 @@ export default function PlaceDetailPage() {
               {place.breadcrumb[1]}
             </nav>
             <div className="grid h-[280px] grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-2">
-              <div className="grid place-items-center rounded-[14px] bg-map text-xs text-sub">
+              <button
+                type="button"
+                aria-label="대표 사진 크게 보기"
+                onClick={() => setGallery(0)}
+                className="grid place-items-center rounded-[14px] bg-map text-xs text-sub hover:brightness-[.97]"
+              >
                 대표 이미지
-              </div>
+              </button>
               <div className="grid grid-rows-2 gap-2">
-                <div className="rounded-[14px] bg-[#E3E8EC]" />
                 <button
                   type="button"
-                  className="grid place-items-center rounded-[14px] bg-[#D6DEE4] text-[13px] font-semibold text-sub"
+                  aria-label="사진 2 크게 보기"
+                  onClick={() => setGallery(1)}
+                  className="rounded-[14px] bg-[#E3E8EC] hover:brightness-[.97]"
+                />
+                <button
+                  type="button"
+                  aria-label={`사진 ${place.extraImageCount}장 더 보기`}
+                  onClick={() => setGallery(2)}
+                  className="grid place-items-center rounded-[14px] bg-[#D6DEE4] text-[13px] font-semibold text-sub hover:brightness-[.97]"
                 >
                   +{place.extraImageCount}
                 </button>
@@ -233,6 +248,16 @@ export default function PlaceDetailPage() {
                 setTripModal(undefined)
                 setAddedTo(title)
               }}
+            />
+          )}
+          {gallery !== undefined && (
+            <ImageGalleryModal
+              open
+              onOpenChange={() => setGallery(undefined)}
+              title={place.name}
+              count={imageCount}
+              index={gallery}
+              onIndexChange={setGallery}
             />
           )}
           <NewTripModal

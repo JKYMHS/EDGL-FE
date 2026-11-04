@@ -1,5 +1,4 @@
 import type {
-  CalendarDay,
   CompanionOption,
   DepartureOption,
   MustVisitPlace,
@@ -27,31 +26,28 @@ export const districtOptions = [
   '강남구',
   '영등포구',
 ]
-export const moreDistrictCount = 17
-
-const week = (
-  days: number[],
-  opts: { outsideFrom?: number; outsideUntil?: number } = {},
-): CalendarDay[] =>
-  days.map((day, i) => {
-    const isPrevMonth = opts.outsideUntil !== undefined && i < opts.outsideUntil
-    const isNextMonth = opts.outsideFrom !== undefined && i >= opts.outsideFrom
-    const month = isNextMonth ? 11 : 10
-    return {
-      day,
-      key: `2026-${month}-${String(day).padStart(2, '0')}`,
-      outside: isPrevMonth || isNextMonth,
-      today: !isNextMonth && day === 19,
-    }
-  })
-
-/** 2026년 10월 셋째 주부터 보이는 3주 (디자인 07-2) */
-export const calendarWeeks: CalendarDay[][] = [
-  week([12, 13, 14, 15, 16, 17, 18]),
-  week([19, 20, 21, 22, 23, 24, 25]),
-  week([26, 27, 28, 29, 30, 31, 1], { outsideFrom: 6 }),
+/** "+17"을 누르면 보이는 서울 나머지 구 */
+export const moreDistrictOptions = [
+  '강동구',
+  '강북구',
+  '강서구',
+  '관악구',
+  '광진구',
+  '구로구',
+  '금천구',
+  '노원구',
+  '도봉구',
+  '동대문구',
+  '동작구',
+  '서대문구',
+  '서초구',
+  '성북구',
+  '양천구',
+  '은평구',
+  '중랑구',
 ]
-/** 지난 날짜(오늘 전)는 회색 */
+
+/** 데모 기준 오늘 (디자인 07-2). 이전 날짜는 회색 */
 export const calendarPastBefore = '2026-10-19'
 export const calendarMonth = { year: 2026, month: 10 }
 
@@ -62,6 +58,9 @@ export const departureResults: DepartureOption[] = [
   { id: 'seoul-bus', name: '서울역 버스환승센터', address: '서울 중구 · 버스' },
   { id: 'seoul-arex', name: '서울역 공항철도', address: '서울 중구 · 지하철' },
 ]
+/** 현재 위치 좌표 → 주소 목업. 카카오 SDK 역지오코딩으로 바꾼다 (TRD 9장) */
+export const resolveDemoAddress = async () => '서울 중구 세종대로 110 근처'
+
 export const recentDepartures = ['김포공항', '용산역', '집']
 
 export const companionOptions: CompanionOption[] = [
@@ -88,6 +87,13 @@ export const mustVisitCandidates: MustVisitPlace[] = [
     period: '10.24 – 10.25',
   },
   { id: 'a-gyeongbok', name: '경복궁', meta: '서울 종로구 · 고궁', period: '상시' },
+]
+/** 꼭 포함할 장소 "장소 이름으로 추가" 검색 대상 */
+export const mustVisitSearchPool: MustVisitPlace[] = [
+  { id: 'a-namsan', name: '남산서울타워', meta: '서울 용산구 · 전망', period: '상시' },
+  { id: 'a-deoksu', name: '덕수궁', meta: '서울 중구 · 고궁', period: '상시' },
+  { id: 'a-museum', name: '국립중앙박물관', meta: '서울 용산구 · 박물관', period: '상시' },
+  { id: 's-cheonggye', name: '청계천', meta: '서울 중구 · 산책로', period: '상시' },
 ]
 export const MUST_VISIT_LIMIT = 5
 

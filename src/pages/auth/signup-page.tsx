@@ -1,9 +1,20 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
-import { emailVerifyDemo, demoUser, terms } from '@/mocks/data/member'
+import { CODE_TTL_SECONDS, RESEND_COOLDOWN_SECONDS } from '@/features/auth'
+import { emailVerifyDemo, demoUser, termBodies, terms, type TermItem } from '@/mocks/data/member'
 import { cn } from '@/shared/lib/cn'
+import { formatClock, parseClock } from '@/shared/lib/time'
+import { useCountdown } from '@/shared/lib/use-countdown'
 import { SignupAccountStep } from './signup-account-step'
-import { Button, Checkbox, NamedStepHeader, StepHeading, StepLayout } from '@/shared/ui'
+import {
+  Button,
+  Checkbox,
+  Modal,
+  NamedStepHeader,
+  StepHeading,
+  StepLayout,
+  Toast,
+} from '@/shared/ui'
 
 const STEPS = ['이메일 · 비밀번호', '이메일 인증', '약관 동의', '취향 입력']
 
@@ -29,13 +40,33 @@ export default function SignupPage() {
   )
 
   if (step === 1) return <SignupAccountStep header={header} onNext={() => goTo(2)} />
-  if (step === 2) return <EmailVerifyStep header={header} onNext={() => goTo(3)} />
+  if (step === 2)
+    return <EmailVerifyStep header={header} onNext={() => goTo(3)} onChangeEmail={() => goTo(1)} />
   return <TermsStep header={header} onPrev={() => goTo(2)} />
 }
 
-function EmailVerifyStep({ header, onNext }: { header: ReactNode; onNext: () => void }) {
+function EmailVerifyStep({
+  header,
+  onNext,
+  onChangeEmail,
+}: {
+  header: ReactNode
+  onNext: () => void
+  onChangeEmail: () => void
+}) {
   const [code, setCode] = useState(emailVerifyDemo.digits.join(''))
-  const complete = code.length === 6
+  const ttl = useCountdown(parseClock(emailVerifyDemo.remaining))
+  const cooldown = useCountdown(emailVerifyDemo.resendIn)
+  const [sent, setSent] = useState(false)
+  const expired = ttl.left === 0
+  const complete = code.length === 6 && !expired
+
+  const resend = () => {
+    ttl.restart(CODE_TTL_SECONDS)
+    cooldown.restart(RESEND_COOLDOWN_SECONDS)
+    setCode('')
+    setSent(true)
+  }
 
   return (
     <StepLayout header={header} bodyClassName="gap-8 pt-24">
@@ -47,7 +78,11 @@ function EmailVerifyStep({ header, onNext }: { header: ReactNode; onNext: () => 
         description={
           <>
             <strong className="font-semibold text-ink">{demoUser.email}</strong>으로 보냈어요 ·{' '}
-            <button type="button" className="font-semibold text-sky-text">
+            <button
+              type="button"
+              onClick={onChangeEmail}
+              className="font-semibold text-sky-text hover:underline"
+            >
               이메일 바꾸기
             </button>
           </>
@@ -82,12 +117,24 @@ function EmailVerifyStep({ header, onNext }: { header: ReactNode; onNext: () => 
         })}
       </label>
       <div className="flex justify-between text-[15px]">
-        <span className="text-sub">
-          남은 시간{' '}
-          <span className="font-mono font-semibold text-ink">{emailVerifyDemo.remaining}</span>
-        </span>
-        <button type="button" disabled className="font-semibold text-[#A3AAB0]">
-          코드 다시 받기 <span className="font-mono">({emailVerifyDemo.resendIn}초)</span>
+        {expired ? (
+          <span role="alert" className="font-semibold text-error">
+            코드가 만료됐어요. 새 코드를 받아 주세요
+          </span>
+        ) : (
+          <span className="text-sub">
+            남은 시간{' '}
+            <span className="font-mono font-semibold text-ink">{formatClock(ttl.left)}</span>
+          </span>
+        )}
+        <button
+          type="button"
+          disabled={cooldown.left > 0}
+          onClick={resend}
+          className="font-semibold text-sky-text hover:underline disabled:text-[#A3AAB0] disabled:no-underline"
+        >
+          코드 다시 받기
+          {cooldown.left > 0 && <span className="font-mono"> ({cooldown.left}초)</span>}
         </button>
       </div>
       <Button size="xl" className="h-14" disabled={!complete} onClick={onNext}>
@@ -96,6 +143,9 @@ function EmailVerifyStep({ header, onNext }: { header: ReactNode; onNext: () => 
       <p className="text-center text-sm leading-normal text-sub">
         메일이 안 왔다면 스팸함을 확인해 주세요. 5회 틀리면 새 코드를 받아야 해요.
       </p>
+      {sent && (
+        <Toast onClose={() => setSent(false)}>{demoUser.email}으로 새 코드를 보냈어요</Toast>
+      )}
     </StepLayout>
   )
 }
@@ -110,6 +160,7 @@ function TermsStep({ header, onPrev }: { header: ReactNode; onPrev: () => void }
   const requiredOk = count(required) === required.length
   const toggle = (id: string) =>
     setAgreed((list) => (list.includes(id) ? list.filter((v) => v !== id) : [...list, id]))
+  const [viewing, setViewing] = useState<TermItem>()
 
   return (
     <StepLayout
@@ -190,7 +241,12 @@ function TermsStep({ header, onPrev }: { header: ReactNode; onPrev: () => void }
               <span className="text-[15px] font-semibold">{t.name}</span>
               {t.description && <span className="text-[13px] text-sub">{t.description}</span>}
             </span>
-            <button type="button" className="text-[13px] font-semibold whitespace-nowrap text-sub">
+            <button
+              type="button"
+              aria-label={`${t.name} 보기`}
+              onClick={() => setViewing(t)}
+              className="text-[13px] font-semibold whitespace-nowrap text-sub hover:text-ink"
+            >
               보기 ›
             </button>
           </li>
@@ -200,6 +256,33 @@ function TermsStep({ header, onPrev }: { header: ReactNode; onPrev: () => void }
         만 14세 미만은 가입할 수 없어요. 위치 정보는 출발지·주변 장소 추천에만 쓰이고, 추천이 끝나면
         저장하지 않아요.
       </p>
+      {viewing && (
+        <Modal
+          open
+          onOpenChange={() => setViewing(undefined)}
+          closeButton
+          title={viewing.name}
+          description={<span className="text-sm">{viewing.required ? '필수' : '선택'} 항목</span>}
+          className="w-[560px] gap-4 rounded-[20px]"
+        >
+          <div className="max-h-[360px] overflow-y-auto rounded-xl bg-field px-5 py-4 text-sm leading-relaxed whitespace-pre-line text-sub">
+            {termBodies[viewing.id]}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setViewing(undefined)}>
+              닫기
+            </Button>
+            <Button
+              onClick={() => {
+                if (!agreed.includes(viewing.id)) toggle(viewing.id)
+                setViewing(undefined)
+              }}
+            >
+              동의
+            </Button>
+          </div>
+        </Modal>
+      )}
     </StepLayout>
   )
 }

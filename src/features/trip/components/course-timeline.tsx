@@ -15,11 +15,14 @@ export function CourseTimeline({
   items,
   focusedId,
   onFocus,
+  onPickMeal,
 }: {
   day: number
   items: CourseItem[]
   focusedId?: string
   onFocus: (id: string) => void
+  /** 식사 슬롯의 "주변 음식점 보기"·"바꾸기" (items 안 위치) */
+  onPickMeal?: (index: number) => void
 }) {
   const color = dayColor(day)
   return (
@@ -46,13 +49,25 @@ export function CourseTimeline({
               className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-3 px-3 py-1.5"
             >
               <span className="font-mono text-[13px] font-medium text-sub">{item.time}</span>
-              <div className="ml-10 flex items-center justify-between rounded-[10px] border-[1.5px] border-dashed border-line-strong px-3.5 py-2.5">
-                <span className="text-sm font-semibold">{item.label}</span>
+              <div
+                className={cn(
+                  'ml-10 flex items-center justify-between rounded-[10px] px-3.5 py-2.5',
+                  item.picked
+                    ? 'bg-white shadow-[inset_0_0_0_1px_var(--color-line)]'
+                    : 'border-[1.5px] border-dashed border-line-strong',
+                )}
+              >
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-sm font-semibold">{item.picked ?? item.label}</span>
+                  {item.picked && <span className="text-xs text-sub">{item.label}</span>}
+                </span>
                 <button
                   type="button"
-                  className="flex items-center gap-1 text-[13px] font-semibold text-sky-text"
+                  onClick={() => onPickMeal?.(i)}
+                  className="flex items-center gap-1 text-[13px] font-semibold text-sky-text hover:underline"
                 >
-                  {item.link} <ArrowRight size={13} strokeWidth={2.5} />
+                  {item.picked ? '바꾸기' : item.link}
+                  {!item.picked && <ArrowRight size={13} strokeWidth={2.5} />}
                 </button>
               </div>
             </li>

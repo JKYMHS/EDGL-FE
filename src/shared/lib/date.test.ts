@@ -20,3 +20,16 @@ describe('date', () => {
     expect(formatShortRange('2026-10-24', '2026-10-24')).toBe('10.24')
   })
 })
+
+describe('달력 계산', () => {
+  it('날짜를 더하고 요일(월=0)을 구한다', async () => {
+    const { addDays, weekdayMonFirst, lastOfMonth, shiftMonth } = await import('./date')
+    expect(addDays('2026-10-31', 1)).toBe('2026-11-01')
+    expect(addDays('2026-01-01', -1)).toBe('2025-12-31')
+    expect(weekdayMonFirst('2026-10-19')).toBe(0)
+    expect(weekdayMonFirst('2026-10-25')).toBe(6)
+    expect(lastOfMonth(2026, 2)).toBe('2026-02-28')
+    expect(shiftMonth(2026, 12, 1)).toEqual({ year: 2027, month: 1 })
+    expect(shiftMonth(2026, 1, -1)).toEqual({ year: 2025, month: 12 })
+  })
+})

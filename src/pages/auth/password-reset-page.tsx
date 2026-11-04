@@ -1,7 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
-import { CodeInput, PasswordField, isValidEmail, isValidPassword } from '@/features/auth'
+import {
+  CODE_TTL_SECONDS,
+  CodeInput,
+  PasswordField,
+  RESEND_COOLDOWN_SECONDS,
+  isValidEmail,
+  isValidPassword,
+} from '@/features/auth'
 import { passwordResetDemo } from '@/mocks/data/member'
+import { formatClock, parseClock } from '@/shared/lib/time'
+import { useCountdown } from '@/shared/lib/use-countdown'
 import { Button, NamedStepHeader, TextField } from '@/shared/ui'
 
 const STEPS = ['이메일 인증', '새 비밀번호']
@@ -35,15 +44,26 @@ export default function PasswordResetPage() {
 function VerifyStep({ onNext }: { onNext: () => void }) {
   const [email, setEmail] = useState(passwordResetDemo.email)
   const [code, setCode] = useState(passwordResetDemo.code)
+  const ttl = useCountdown(parseClock(passwordResetDemo.remaining))
+  const cooldown = useCountdown(passwordResetDemo.resendIn)
+  const [resent, setResent] = useState(false)
   // 예시: 처음 입력한 코드는 틀린 상태 (VERIFICATION_CODE_MISMATCH)
   const mismatch = code === passwordResetDemo.code
+  const expired = ttl.left === 0
+
+  const resend = () => {
+    ttl.restart(CODE_TTL_SECONDS)
+    cooldown.restart(RESEND_COOLDOWN_SECONDS)
+    setCode('')
+    setResent(true)
+  }
 
   return (
     <form
       className="flex w-[440px] flex-col gap-[22px]"
       onSubmit={(e) => {
         e.preventDefault()
-        if (code.length === 6 && !mismatch) onNext()
+        if (code.length === 6 && !mismatch && !expired) onNext()
       }}
     >
       <div className="flex flex-col gap-2">
@@ -61,34 +81,44 @@ function VerifyStep({ onNext }: { onNext: () => void }) {
           />
           <Button
             variant="secondary"
-            disabled
+            disabled={cooldown.left > 0 || !isValidEmail(email)}
+            onClick={resend}
             className="h-12 shadow-[inset_0_0_0_1px_var(--color-line)]"
           >
-            다시 받기{' '}
-            <span className="font-mono text-[13px]">({passwordResetDemo.resendIn}초)</span>
+            다시 받기
+            {cooldown.left > 0 && (
+              <span className="font-mono text-[13px]"> ({cooldown.left}초)</span>
+            )}
           </Button>
         </div>
         {isValidEmail(email) && (
           <p className="text-[13px] text-sub">
-            코드를 보냈어요. 메일이 안 왔다면 스팸함을 확인해 주세요.
+            {resent ? '새 코드를 보냈어요.' : '코드를 보냈어요.'} 메일이 안 왔다면 스팸함을 확인해
+            주세요.
           </p>
         )}
       </div>
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold">인증 코드</span>
-          <span className="text-[13px] text-sub">
-            남은 시간 <b className="font-mono text-ink">{passwordResetDemo.remaining}</b>
-          </span>
+          {expired ? (
+            <span role="alert" className="text-[13px] font-semibold text-error">
+              코드가 만료됐어요. 다시 받아 주세요
+            </span>
+          ) : (
+            <span className="text-[13px] text-sub">
+              남은 시간 <b className="font-mono text-ink">{formatClock(ttl.left)}</b>
+            </span>
+          )}
         </div>
         <CodeInput value={code} onChange={setCode} error={mismatch} />
-        {mismatch && (
+        {mismatch && !resent && (
           <p className="text-[13px] text-error">
             코드가 맞지 않아요. {passwordResetDemo.attemptsLeft}번 더 입력할 수 있어요.
           </p>
         )}
       </div>
-      <Button type="submit" size="xl" disabled={code.length < 6}>
+      <Button type="submit" size="xl" disabled={code.length < 6 || expired}>
         확인
       </Button>
     </form>

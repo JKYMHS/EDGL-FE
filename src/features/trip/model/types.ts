@@ -19,7 +19,14 @@ export type CourseMove = {
   mode: Exclude<RouteMode, 'temp' | 'progress'>
   label: string
 }
-export type CourseMeal = { kind: 'meal'; time: string; label: string; link: string }
+export type CourseMeal = {
+  kind: 'meal'
+  time: string
+  label: string
+  link: string
+  /** 고른 음식점. 고르면 저장·캘린더 업로드에 포함된다 (PRD 003-10) */
+  picked?: string
+}
 export type CourseItem = CourseStop | CourseMove | CourseMeal
 
 export type Course = {
@@ -65,6 +72,19 @@ export type EditItem = {
   name: string
   time: string
   warning?: string
+  /** 항목 메뉴 "메모 추가"로 남긴 메모 */
+  memo?: string
+  point: MapPoint
+}
+
+/** 일정 편집 "장소 추가" 후보 */
+export type AddPlaceSource = 'liked' | 'search' | 'nearby'
+export type AddPlaceCandidate = {
+  id: string
+  name: string
+  meta: string
+  /** 기본 체류 시간(분) */
+  stay: number
   point: MapPoint
 }
 

@@ -3,6 +3,14 @@ import { cn } from '@/shared/lib/cn'
 import { StartMarker } from '@/shared/map'
 import { Chip, SearchMark } from '@/shared/ui'
 import type { DepartureOption } from '../model/types'
+import type { LocateStatus } from '../model/use-current-location'
+
+const LOCATE_MESSAGE: Partial<Record<LocateStatus, string>> = {
+  locating: '현재 위치를 찾고 있어요…',
+  denied:
+    '브라우저에서 위치 권한이 꺼져 있어요. 주소 표시줄 왼쪽에서 허용하거나 직접 검색해 주세요.',
+  unavailable: '현재 위치를 찾지 못했어요. 직접 검색해 주세요.',
+}
 
 /** 07-3 출발지: 검색 결과 · 현재 위치 · 최근 출발지 (FUNC-003-01) */
 export function DepartureStep({
@@ -12,6 +20,8 @@ export function DepartureStep({
   selectedId,
   onQueryChange,
   onSelect,
+  locateStatus = 'idle',
+  onUseCurrentLocation,
 }: {
   query: string
   results: DepartureOption[]
@@ -19,7 +29,10 @@ export function DepartureStep({
   selectedId: string
   onQueryChange: (q: string) => void
   onSelect: (id: string) => void
+  locateStatus?: LocateStatus
+  onUseCurrentLocation: () => void
 }) {
+  const message = LOCATE_MESSAGE[locateStatus]
   return (
     <>
       <label className="flex h-14 items-center gap-3 rounded-xl border-[1.5px] border-sky px-4 shadow-[0_0_0_4px_var(--color-sky-soft)]">
@@ -45,12 +58,27 @@ export function DepartureStep({
       <div role="listbox" aria-label="출발지 후보" className="flex flex-col">
         <button
           type="button"
-          className="grid grid-cols-[36px_minmax(0,1fr)] items-center gap-3 border-b border-surface px-3 py-3.5 text-left"
+          disabled={locateStatus === 'locating'}
+          onClick={onUseCurrentLocation}
+          className="grid grid-cols-[36px_minmax(0,1fr)] items-center gap-3 border-b border-surface px-3 py-3.5 text-left hover:bg-[#F8FAFB] disabled:opacity-60"
         >
           <span className="grid size-7 place-items-center rounded-full bg-field text-[13px] text-sky-text">
             ◎
           </span>
-          <span className="text-[15px] font-semibold text-sky-text">현재 위치 사용하기</span>
+          <span className="flex flex-col gap-0.5">
+            <span className="text-[15px] font-semibold text-sky-text">현재 위치 사용하기</span>
+            {message && (
+              <span
+                role={locateStatus === 'locating' ? 'status' : 'alert'}
+                className={cn(
+                  'text-[13px]',
+                  locateStatus === 'locating' ? 'text-sub' : 'text-error',
+                )}
+              >
+                {message}
+              </span>
+            )}
+          </span>
         </button>
         {results.map((r) => {
           const selected = r.id === selectedId

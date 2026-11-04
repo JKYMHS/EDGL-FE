@@ -33,3 +33,35 @@ export function formatShortRange(start: string, end: string) {
   const [, em, ed] = end.split('-')
   return `${formatMonthDay(start)} – ${sm === em ? ed : formatMonthDay(end)}`
 }
+
+function fromUtc(ms: number) {
+  const d = new Date(ms)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`
+}
+
+/** "YYYY-MM-DD"에 n일을 더한다 */
+export function addDays(ymd: string, n: number) {
+  return fromUtc(toUtc(ymd) + n * DAY_MS)
+}
+
+/** 요일 (월=0 … 일=6) */
+export function weekdayMonFirst(ymd: string) {
+  return (new Date(toUtc(ymd)).getUTCDay() + 6) % 7
+}
+
+/** 그 달의 1일 "YYYY-MM-01" */
+export function firstOfMonth(year: number, month: number) {
+  return `${year}-${String(month).padStart(2, '0')}-01`
+}
+
+/** 그 달의 마지막 날 */
+export function lastOfMonth(year: number, month: number) {
+  return fromUtc(Date.UTC(year, month, 0))
+}
+
+/** 달을 n개월 옮긴다. { year, month } (month 1~12) */
+export function shiftMonth(year: number, month: number, n: number) {
+  const index = year * 12 + (month - 1) + n
+  return { year: Math.floor(index / 12), month: (index % 12) + 1 }
+}

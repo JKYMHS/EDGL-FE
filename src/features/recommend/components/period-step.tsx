@@ -1,9 +1,9 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { daysBetween } from '@/shared/lib/date'
+import { daysBetween, shiftMonth } from '@/shared/lib/date'
 import { cn } from '@/shared/lib/cn'
 import { Segmented } from '@/shared/ui'
-import type { CalendarDay } from '../model/types'
+import { buildWeeks, MAX_MONTHS_AHEAD } from '../model/calendar'
 
 const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일']
 /** 최대 3박 4일 (PRD 8.1) */
@@ -20,8 +20,8 @@ function nextRange(start: string | undefined, end: string | undefined, clicked: 
 export function PeriodStep({
   year,
   month,
-  weeks,
-  pastBefore,
+  today,
+  onMonthChange,
   start,
   end,
   startTime,
@@ -32,8 +32,9 @@ export function PeriodStep({
 }: {
   year: number
   month: number
-  weeks: CalendarDay[][]
-  pastBefore: string
+  /** 오늘 "YYYY-MM-DD". 이전 날짜는 고를 수 없다 */
+  today: string
+  onMonthChange: (ym: { year: number; month: number }) => void
   start?: string
   end?: string
   startTime: string
@@ -42,7 +43,23 @@ export function PeriodStep({
   onRangeChange: (range: { start?: string; end?: string }) => void
   onStartTimeChange: (time: string) => void
 }) {
-  const [monthPickerOpen, setMonthPickerOpen] = useState(false)
+  const [picker, setPicker] = useState<'year' | 'month'>()
+  const monthPickerOpen = picker === 'month'
+  const pastBefore = today
+  const weeks = buildWeeks(year, month, today)
+  const min = { year: Number(today.slice(0, 4)), month: Number(today.slice(5, 7)) }
+  const max = shiftMonth(min.year, min.month, MAX_MONTHS_AHEAD)
+  const index = (ym: { year: number; month: number }) => ym.year * 12 + ym.month
+  const allowed = (ym: { year: number; month: number }) =>
+    index(ym) >= index(min) && index(ym) <= index(max)
+  const clamp = (ym: { year: number; month: number }) =>
+    index(ym) < index(min) ? min : index(ym) > index(max) ? max : ym
+  const go = (ym: { year: number; month: number }) => {
+    if (!allowed(ym)) return
+    onMonthChange(ym)
+    setPicker(undefined)
+  }
+  const years = Array.from({ length: max.year - min.year + 1 }, (_, i) => min.year + i)
 
   return (
     <>
@@ -51,16 +68,26 @@ export function PeriodStep({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="flex h-10 items-center gap-2 rounded-[10px] border border-line pr-3 pl-3.5 font-mono text-[15px] font-semibold"
+              aria-expanded={picker === 'year'}
+              aria-label={`${year}년, 연도 고르기`}
+              onClick={() => setPicker((v) => (v === 'year' ? undefined : 'year'))}
+              className={cn(
+                'flex h-10 items-center gap-2 rounded-[10px] border border-line pr-3 pl-3.5 font-mono text-[15px] font-semibold',
+                picker === 'year' &&
+                  'border-[1.5px] border-sky shadow-[0_0_0_4px_var(--color-sky-soft)]',
+              )}
             >
               {year}
               <span className="font-sans text-sm">년</span>
-              <span className="text-xs text-muted">▾</span>
+              <span className={cn('text-xs', picker === 'year' ? 'text-sky-text' : 'text-muted')}>
+                {picker === 'year' ? '▴' : '▾'}
+              </span>
             </button>
             <button
               type="button"
               aria-expanded={monthPickerOpen}
-              onClick={() => setMonthPickerOpen((v) => !v)}
+              aria-label={`${month}월, 달 고르기`}
+              onClick={() => setPicker((v) => (v === 'month' ? undefined : 'month'))}
               className={cn(
                 'flex h-10 items-center gap-2 rounded-[10px] border border-line pr-3 pl-3.5 font-mono text-[15px] font-semibold',
                 monthPickerOpen &&
@@ -73,7 +100,11 @@ export function PeriodStep({
                 {monthPickerOpen ? '▴' : '▾'}
               </span>
             </button>
-            <button type="button" className="h-10 px-3 text-[13px] font-semibold text-sky-text">
+            <button
+              type="button"
+              onClick={() => go(min)}
+              className="h-10 px-3 text-[13px] font-semibold text-sky-text hover:underline"
+            >
               오늘로
             </button>
           </div>
@@ -81,15 +112,18 @@ export function PeriodStep({
             <button
               type="button"
               aria-label="이전 달"
-              disabled
-              className="grid size-10 place-items-center rounded-[10px] border border-line text-[#A3AAB0]"
+              disabled={!allowed(shiftMonth(year, month, -1))}
+              onClick={() => go(shiftMonth(year, month, -1))}
+              className="grid size-10 place-items-center rounded-[10px] border border-line enabled:hover:bg-field disabled:text-[#A3AAB0]"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               type="button"
               aria-label="다음 달"
-              className="grid size-10 place-items-center rounded-[10px] border border-line"
+              disabled={!allowed(shiftMonth(year, month, 1))}
+              onClick={() => go(shiftMonth(year, month, 1))}
+              className="grid size-10 place-items-center rounded-[10px] border border-line enabled:hover:bg-field disabled:text-[#A3AAB0]"
             >
               <ChevronRight size={16} />
             </button>
@@ -99,22 +133,45 @@ export function PeriodStep({
               <span className="col-span-full px-1 pt-0.5 pb-1.5 text-xs font-semibold text-sub">
                 {year}년
               </span>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
+                const ok = allowed({ year, month: m })
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    disabled={!ok}
+                    onClick={() => go({ year, month: m })}
+                    className={cn(
+                      'h-10 rounded-[9px] text-sm font-semibold',
+                      m === month ? 'bg-sky text-white' : !ok ? 'text-[#C4CACF]' : 'hover:bg-field',
+                    )}
+                  >
+                    {m}월
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          {picker === 'year' && (
+            <div
+              role="listbox"
+              aria-label="연도"
+              className="absolute top-12 left-0 z-10 flex w-[160px] flex-col gap-1 rounded-[14px] bg-white p-2 shadow-[0_12px_32px_rgba(30,36,32,.18)]"
+            >
+              {years.map((y) => (
                 <button
-                  key={m}
+                  key={y}
                   type="button"
-                  disabled={m < month}
-                  onClick={() => setMonthPickerOpen(false)}
+                  role="option"
+                  aria-selected={y === year}
+                  // 해를 바꿔도 같은 달을 보되, 고를 수 있는 범위 끝으로 맞춘다
+                  onClick={() => go(clamp({ year: y, month }))}
                   className={cn(
-                    'h-10 rounded-[9px] text-sm font-semibold',
-                    m === month
-                      ? 'bg-sky text-white'
-                      : m < month
-                        ? 'text-[#C4CACF]'
-                        : 'hover:bg-field',
+                    'h-10 rounded-[9px] font-mono text-sm font-semibold',
+                    y === year ? 'bg-sky text-white' : 'hover:bg-field',
                   )}
                 >
-                  {m}월
+                  {y}년
                 </button>
               ))}
             </div>
