@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { MainLayout } from './layouts/main-layout'
+import { RedirectKeepingSearch } from './redirect-keeping-search'
 
 type PageModule = { default: ComponentType }
 const page = (load: () => Promise<PageModule>) => () =>
@@ -34,7 +35,8 @@ export const routes: RouteObject[] = [
             path: '/places/:id',
             lazy: page(() => import('@/pages/place-detail/place-detail-page')),
           },
-          { path: '/likes', lazy: page(() => import('@/pages/likes/likes-page')) },
+          // 찜은 마이페이지 안으로 옮겼다. 예전 주소는 탭 쿼리를 그대로 들고 넘긴다
+          { path: '/likes', element: <RedirectKeepingSearch to="/my/likes" /> },
           {
             path: '/recommend/:requestId',
             lazy: page(() => import('@/pages/recommend/recommend-result-page')),
@@ -53,7 +55,8 @@ export const routes: RouteObject[] = [
             path: '/my',
             lazy: page(() => import('@/pages/my/my-layout')),
             children: [
-              { index: true, element: <Navigate to="/my/preferences" replace /> },
+              { index: true, element: <Navigate to="/my/likes" replace /> },
+              { path: 'likes', lazy: page(() => import('@/pages/my/likes-page')) },
               { path: 'preferences', lazy: page(() => import('@/pages/my/preferences-page')) },
               { path: 'account', lazy: page(() => import('@/pages/my/account-page')) },
               { path: 'calendar', lazy: page(() => import('@/pages/my/calendar-page')) },

@@ -40,14 +40,7 @@ export default function SearchStartPage() {
         <NavLink to="/trips" className="hover:text-ink">
           내 여행
         </NavLink>
-        <NavLink to="/likes" className="hover:text-ink">
-          찜
-        </NavLink>
-        <Link
-          to="/my/preferences"
-          aria-label="마이페이지"
-          className="size-[34px] rounded-full bg-map"
-        />
+        <Link to="/my/likes" aria-label="마이페이지" className="size-[34px] rounded-full bg-map" />
       </header>
       <main className="flex flex-1 flex-col items-center gap-7 pt-[170px]">
         <h1 className="text-[64px] leading-none font-extrabold tracking-[-0.04em]">어디 갈래</h1>

@@ -12,7 +12,6 @@ const MENU: MenuItem[] = [
   { to: '/explore', label: '탐색', match: ['/explore', '/places'] },
   { to: '/recommend', label: 'AI 추천', match: ['/recommend'], gate: 'recommend' },
   { to: '/trips', label: '내 여행', match: ['/trips'], gate: 'trip' },
-  { to: '/likes', label: '찜', match: ['/likes'], gate: 'wish' },
 ]
 
 /** 글로벌 헤더: 로고 · 검색창 · 메뉴 · 프로필 (PRD 6.1, 디자인 04, 14-1) */
@@ -58,7 +57,7 @@ export function GlobalHeader() {
       </nav>
       {isLoggedIn ? (
         <Link
-          to="/my/preferences"
+          to="/my/likes"
           aria-label="마이페이지"
           className={cn(
             'size-[34px] shrink-0 rounded-full',

@@ -6,13 +6,14 @@ import { cn } from '@/shared/lib/cn'
 import { ConfirmDialog } from '@/shared/ui'
 
 const MENU = [
+  { to: '/my/likes', label: '찜한 곳' },
   { to: '/my/account', label: '계정' },
   { to: '/my/preferences', label: '취향 설정' },
   { to: '/my/calendar', label: '캘린더 연동' },
   { to: '/my/password', label: '비밀번호 변경' },
 ]
 
-/** 마이페이지 사이드 메뉴 (디자인 13, 시안 C-4·C-5) · FUNC-001-04, 10~12, 14, 15, 005-01 */
+/** 마이페이지 사이드 메뉴 (디자인 13, 시안 C-4·C-5) · FUNC-001-04, 10~12, 14, 15, 002-06, 005-01 */
 export default function MyLayout() {
   const navigate = useNavigate()
   const [logoutOpen, setLogoutOpen] = useState(false)

@@ -64,8 +64,8 @@ export const SCREENS: ScreenLink[] = [
   { id: '04', name: '탐색 홈 — 축제 탭', path: '/explore' },
   { id: '04-2', name: '탐색 홈 — 관광지 탭', path: '/explore?tab=place' },
   { id: '05', name: '상세', path: '/places/f-bitchorong' },
-  { id: '06', name: '찜 목록 — 축제 탭', path: '/likes' },
-  { id: '06-2', name: '찜 목록 — 관광지 탭', path: '/likes?tab=place' },
+  { id: '06', name: '마이페이지 — 찜한 곳 (축제 탭)', path: '/my/likes' },
+  { id: '06-2', name: '마이페이지 — 찜한 곳 (관광지 탭)', path: '/my/likes?tab=place' },
   { id: '07-1', name: '추천 요청 — 지역', path: '/recommend?step=1' },
   {
     id: '07-2',
